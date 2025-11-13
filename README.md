@@ -42,6 +42,8 @@ def test_reverse(text: str, expected: str):
 ## Installation
 
 ```bash
+uv pip install pytest-param-table
+# or
 pip install pytest-param-table
 ```
 
@@ -258,26 +260,26 @@ git clone https://github.com/yourusername/pytest-param-table
 cd pytest-param-table
 
 # Install in dev mode with hooks auto-install
-pip install -e ".[dev]"
+uv pip install -e ".[dev]"
 
 # Manually install git hooks (if needed)
 pytest-param-table-install-hooks
 
 # Run tests
-pytest
+uv run pytest
 
 # Run tests with coverage
-pytest --cov=pytest_param_table --cov-report=html
+uv run pytest --cov=pytest_param_table --cov-report=html
 
 # Type checking
-pyright
+uv run pyright
 
 # Linting and formatting
-ruff check src/ tests/
-ruff format src/ tests/
+uv run ruff check src/ tests/
+uv run ruff format src/ tests/
 
 # Run pre-commit hooks manually
-pre-commit run --all-files
+uv run pre-commit run --all-files
 ```
 
 ### Git Hooks

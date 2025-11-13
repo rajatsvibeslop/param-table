@@ -35,10 +35,17 @@ def main() -> int:
         )
     except (subprocess.CalledProcessError, FileNotFoundError):
         print("Installing pre-commit...")
-        subprocess.run(
-            [sys.executable, "-m", "pip", "install", "pre-commit"],
-            check=True,
-        )
+        # Try uv first, fall back to pip
+        try:
+            subprocess.run(
+                ["uv", "pip", "install", "pre-commit"],
+                check=True,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", "pre-commit"],
+                check=True,
+            )
 
     # Install the pre-commit hooks
     print("Installing pre-commit hooks...")
