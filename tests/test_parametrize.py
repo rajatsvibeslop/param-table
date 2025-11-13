@@ -195,6 +195,18 @@ class TestMarks:
 
         assert hasattr(test_mixed, "pytestmark")
 
+    def test_multiple_params_with_marks(self):
+        """Test multiple parameters with marks."""
+
+        @param_table({
+            "normal": {"x": 1, "y": 2},
+            "marked_case": marked({"x": 3, "y": 4}, pytest.mark.xfail),
+        })
+        def test_multi_param_marks(x: int, y: int):
+            assert x > 0 and y > 0
+
+        assert hasattr(test_multi_param_marks, "pytestmark")
+
 
 # Test type validation
 class TestTypeValidation:
@@ -348,6 +360,48 @@ class TestEdgeCases:
         assert isinstance(mc, MarkedCase)
         assert mc.params == {"x": 1}
         assert len(mc.marks) == 1
+
+    def test_extra_parameters_raises_error(self):
+        """Test that providing params not in function signature raises ValueError."""
+
+        with pytest.raises(ValueError, match="provided parameter.*not in function signature"):
+            @param_table({
+                "case1": {"x": 1, "z": 999},  # z is not in function signature
+            })
+            def test_extra(x: int, y: int):
+                pass
+
+    def test_function_with_problematic_type_hints(self):
+        """Test handling of functions where get_type_hints fails."""
+        # Create a function with forward references that can't be resolved
+        def make_test():
+            # Use string annotation that references non-existent type
+            @param_table({
+                "case1": {"x": 1},
+            })
+            def test_bad_hints(x: "NonExistentType"):  # noqa: F821
+                pass
+            return test_bad_hints
+
+        # This should not raise an error, just skip type checking
+        test_func = make_test()
+        assert hasattr(test_func, "pytestmark")
+
+    def test_lambda_function_without_source_location(self):
+        """Test that functions without source info still work."""
+        # Lambdas don't have source lines, testing the except branch
+        # We can't use lambda directly with decorator, but we can test with exec
+        import types
+
+        # Create a function dynamically
+        code = compile("def test_func(x: int): pass", "<string>", "exec")
+        namespace = {}
+        exec(code, namespace)
+        func = namespace["test_func"]
+
+        # Apply decorator
+        decorated = param_table({"case1": {"x": 1}})(func)
+        assert hasattr(decorated, "pytestmark")
 
 
 # Integration tests - actual test execution
