@@ -322,6 +322,25 @@ Contributions welcome! Please:
 4. Ensure all tests pass
 5. Submit a pull request
 
+## Publishing
+
+This project uses automated releases via GitHub Actions. See [PUBLISHING.md](PUBLISHING.md) for details.
+
+Quick release process:
+```bash
+# 1. Update version in pyproject.toml
+# 2. Commit and push
+git add pyproject.toml
+git commit -m "Bump version to 0.2.0"
+git push
+
+# 3. Create and push tag
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+GitHub Actions automatically publishes to PyPI and creates a release.
+
 ## Changelog
 
 ### 0.1.0 (Initial Release)
@@ -333,6 +352,7 @@ Contributions welcome! Please:
 - ✅ Support for defaults
 - ✅ Comprehensive test suite
 - ✅ Full documentation
+- ✅ Automated CI/CD with GitHub Actions
 
 ## Credits
 
