@@ -1,0 +1,56 @@
+# Pre-commit hooks for pytest-param-table
+# Install with: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+default_install_hook_types: [pre-commit, pre-push]
+
+repos:
+  # Ruff - Fast Python linter and formatter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      # Linter
+      - id: ruff
+        name: ruff lint
+        args: [--fix]
+        types_or: [python, pyi]
+      # Formatter
+      - id: ruff-format
+        name: ruff format
+        types_or: [python, pyi]
+
+  # Pyright/ty - Python type checker
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.389
+    hooks:
+      - id: pyright
+        name: pyright type check
+        additional_dependencies:
+          - pytest>=7.0
+          - typeguard>=4.0
+
+  # Basic file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  # Pre-push: Run full test suite
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest (pre-push)
+        entry: pytest
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-push]
+        always_run: true
+        args: [-v, --tb=short]
