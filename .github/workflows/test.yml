@@ -29,8 +29,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: |
-          uv pip install --system -e ".[dev]"
+        run: uv sync --extra dev --locked
 
       - name: Run tests with coverage
         run: |
@@ -59,8 +58,7 @@ jobs:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: |
-          uv pip install --system -e ".[dev]"
+        run: uv sync --extra dev --locked
 
       - name: Run ruff
         run: |

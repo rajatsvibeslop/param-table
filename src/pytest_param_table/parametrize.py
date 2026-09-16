@@ -1,8 +1,9 @@
 """Table-driven test parametrization for pytest."""
 
 import inspect
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, get_type_hints
+from typing import Any, get_type_hints
 
 import pytest
 from typeguard import check_type
@@ -13,10 +14,10 @@ class MarkedCase:
     """Wrapper for test case params with pytest marks."""
 
     params: dict[str, Any]
-    marks: tuple[pytest.Mark, ...]
+    marks: tuple[pytest.MarkDecorator | pytest.Mark, ...]
 
 
-def marked(params: dict[str, Any], *marks: pytest.Mark) -> MarkedCase:
+def marked(params: dict[str, Any], *marks: pytest.MarkDecorator | pytest.Mark) -> MarkedCase:
     """
     Attach pytest marks to a test case for use with @param_table.
 
@@ -79,8 +80,8 @@ def param_table(
         regular_params = {
             name: param
             for name, param in params.items()
-            if param.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                             inspect.Parameter.KEYWORD_ONLY)
+            if param.kind
+            in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)
             and name not in ("self", "cls")
         }
 
@@ -94,7 +95,7 @@ def param_table(
         # Get function location for error messages
         try:
             filename = inspect.getsourcefile(func) or "<unknown>"
-            lines, start_line = inspect.getsourcelines(func)
+            _, start_line = inspect.getsourcelines(func)
             location = f"{filename}:{start_line}"
         except Exception:
             location = "<unknown location>"
@@ -131,7 +132,6 @@ def param_table(
 
         # Build normalized cases and validate
         normalized_cases = []
-        case_ids = []
 
         for case_name, case_value in cases.items():
             # Extract params and marks
@@ -180,7 +180,6 @@ def param_table(
 
             # Store normalized case
             normalized_cases.append((case_name, combined_params, case_marks))
-            case_ids.append(case_name)
 
         # Build parameter names list in consistent order
         # Use the order from the function signature, but only include owned params
@@ -208,8 +207,6 @@ def param_table(
                     values.append(pytest.param(*value_tuple, id=case_name))
 
         # Delegate to pytest.mark.parametrize
-        return pytest.mark.parametrize(
-            ",".join(param_names_list), values
-        )(func)
+        return pytest.mark.parametrize(",".join(param_names_list), values)(func)
 
     return decorator

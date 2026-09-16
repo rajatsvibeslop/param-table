@@ -1,6 +1,9 @@
 """Comprehensive tests for pytest_param_table."""
 
+from typing import Any
+
 import pytest
+
 from pytest_param_table import MarkedCase, marked, param_table
 
 
@@ -11,11 +14,13 @@ class TestBasicFunctionality:
     def test_single_parameter(self):
         """Test with a single parameter."""
 
-        @param_table({
-            "case1": {"x": 1},
-            "case2": {"x": 2},
-            "case3": {"x": 3},
-        })
+        @param_table(
+            {
+                "case1": {"x": 1},
+                "case2": {"x": 2},
+                "case3": {"x": 3},
+            }
+        )
         def test_single(x: int):
             assert isinstance(x, int)
             assert x in [1, 2, 3]
@@ -26,10 +31,12 @@ class TestBasicFunctionality:
     def test_multiple_parameters(self):
         """Test with multiple parameters."""
 
-        @param_table({
-            "case1": {"x": 1, "y": "a"},
-            "case2": {"x": 2, "y": "b"},
-        })
+        @param_table(
+            {
+                "case1": {"x": 1, "y": "a"},
+                "case2": {"x": 2, "y": "b"},
+            }
+        )
         def test_multiple(x: int, y: str):
             assert isinstance(x, int)
             assert isinstance(y, str)
@@ -39,15 +46,17 @@ class TestBasicFunctionality:
     def test_various_types(self):
         """Test with various Python types."""
 
-        @param_table({
-            "int_case": {"value": 42, "expected_type": int},
-            "str_case": {"value": "hello", "expected_type": str},
-            "bool_case": {"value": True, "expected_type": bool},
-            "float_case": {"value": 3.14, "expected_type": float},
-            "none_case": {"value": None, "expected_type": type(None)},
-            "list_case": {"value": [1, 2, 3], "expected_type": list},
-            "dict_case": {"value": {"key": "val"}, "expected_type": dict},
-        })
+        @param_table(
+            {
+                "int_case": {"value": 42, "expected_type": int},
+                "str_case": {"value": "hello", "expected_type": str},
+                "bool_case": {"value": True, "expected_type": bool},
+                "float_case": {"value": 3.14, "expected_type": float},
+                "none_case": {"value": None, "expected_type": type(None)},
+                "list_case": {"value": [1, 2, 3], "expected_type": list},
+                "dict_case": {"value": {"key": "val"}, "expected_type": dict},
+            }
+        )
         def test_types(value: Any, expected_type: type):
             assert isinstance(value, expected_type)
 
@@ -144,10 +153,12 @@ class TestMarks:
     def test_single_mark(self):
         """Test with a single pytest mark."""
 
-        @param_table({
-            "normal": {"x": 1},
-            "xfail_case": marked({"x": -1}, pytest.mark.xfail),
-        })
+        @param_table(
+            {
+                "normal": {"x": 1},
+                "xfail_case": marked({"x": -1}, pytest.mark.xfail),
+            }
+        )
         def test_with_xfail(x: int):
             assert x > 0
 
@@ -156,10 +167,12 @@ class TestMarks:
     def test_skip_mark(self):
         """Test with skip mark."""
 
-        @param_table({
-            "normal": {"x": 1},
-            "skip_case": marked({"x": 999}, pytest.mark.skip(reason="Testing skip")),
-        })
+        @param_table(
+            {
+                "normal": {"x": 1},
+                "skip_case": marked({"x": 999}, pytest.mark.skip(reason="Testing skip")),
+            }
+        )
         def test_with_skip(x: int):
             assert x > 0
 
@@ -168,14 +181,16 @@ class TestMarks:
     def test_multiple_marks_on_case(self):
         """Test with multiple marks on the same case."""
 
-        @param_table({
-            "normal": {"x": 1},
-            "multi_mark": marked(
-                {"x": 5},
-                pytest.mark.slow,
-                pytest.mark.integration,
-            ),
-        })
+        @param_table(
+            {
+                "normal": {"x": 1},
+                "multi_mark": marked(
+                    {"x": 5},
+                    pytest.mark.slow,
+                    pytest.mark.integration,
+                ),
+            }
+        )
         def test_multi_marks(x: int):
             assert x > 0
 
@@ -184,12 +199,14 @@ class TestMarks:
     def test_mixed_marked_unmarked(self):
         """Test mix of marked and unmarked cases."""
 
-        @param_table({
-            "case1": {"x": 1},
-            "case2": marked({"x": 2}, pytest.mark.xfail),
-            "case3": {"x": 3},
-            "case4": marked({"x": 4}, pytest.mark.slow),
-        })
+        @param_table(
+            {
+                "case1": {"x": 1},
+                "case2": marked({"x": 2}, pytest.mark.xfail),
+                "case3": {"x": 3},
+                "case4": marked({"x": 4}, pytest.mark.slow),
+            }
+        )
         def test_mixed(x: int):
             assert x > 0
 
@@ -198,10 +215,12 @@ class TestMarks:
     def test_multiple_params_with_marks(self):
         """Test multiple parameters with marks."""
 
-        @param_table({
-            "normal": {"x": 1, "y": 2},
-            "marked_case": marked({"x": 3, "y": 4}, pytest.mark.xfail),
-        })
+        @param_table(
+            {
+                "normal": {"x": 1, "y": 2},
+                "marked_case": marked({"x": 3, "y": 4}, pytest.mark.xfail),
+            }
+        )
         def test_multi_param_marks(x: int, y: int):
             assert x > 0 and y > 0
 
@@ -215,10 +234,12 @@ class TestTypeValidation:
     def test_correct_types_pass(self):
         """Test that correct types don't raise errors."""
 
-        @param_table({
-            "int_case": {"x": 42, "y": "world"},
-            "str_case": {"x": 100, "y": "hello"},
-        })
+        @param_table(
+            {
+                "int_case": {"x": 42, "y": "world"},
+                "str_case": {"x": 100, "y": "hello"},
+            }
+        )
         def test_correct(x: int, y: str):
             pass
 
@@ -228,19 +249,24 @@ class TestTypeValidation:
         """Test that wrong types raise TypeError."""
 
         with pytest.raises(TypeError, match="type mismatch"):
-            @param_table({
-                "bad_type": {"x": "not an int"},
-            })
+
+            @param_table(
+                {
+                    "bad_type": {"x": "not an int"},
+                }
+            )
             def test_wrong_type(x: int):
                 pass
 
     def test_optional_types(self):
         """Test with Optional types (int | None)."""
 
-        @param_table({
-            "with_value": {"x": 5},
-            "with_none": {"x": None},
-        })
+        @param_table(
+            {
+                "with_value": {"x": 5},
+                "with_none": {"x": None},
+            }
+        )
         def test_optional(x: int | None):
             assert x is None or isinstance(x, int)
 
@@ -249,10 +275,12 @@ class TestTypeValidation:
     def test_union_types(self):
         """Test with Union types (int | str)."""
 
-        @param_table({
-            "int_case": {"x": 42},
-            "str_case": {"x": "hello"},
-        })
+        @param_table(
+            {
+                "int_case": {"x": 42},
+                "str_case": {"x": "hello"},
+            }
+        )
         def test_union(x: int | str):
             assert isinstance(x, (int, str))
 
@@ -261,10 +289,12 @@ class TestTypeValidation:
     def test_generic_types(self):
         """Test with generic types like list[int]."""
 
-        @param_table({
-            "int_list": {"items": [1, 2, 3]},
-            "empty_list": {"items": []},
-        })
+        @param_table(
+            {
+                "int_list": {"items": [1, 2, 3]},
+                "empty_list": {"items": []},
+            }
+        )
         def test_generic(items: list[int]):
             assert isinstance(items, list)
 
@@ -273,11 +303,13 @@ class TestTypeValidation:
     def test_no_type_hints_skips_validation(self):
         """Test that missing type hints doesn't cause errors."""
 
-        @param_table({
-            "case1": {"x": "string"},
-            "case2": {"x": 123},
-            "case3": {"x": None},
-        })
+        @param_table(
+            {
+                "case1": {"x": "string"},
+                "case2": {"x": 123},
+                "case3": {"x": None},
+            }
+        )
         def test_no_hints(x):  # No type hint
             pass
 
@@ -292,6 +324,7 @@ class TestErrorCases:
         """Test that empty cases dict raises ValueError."""
 
         with pytest.raises(ValueError, match="at least one test case"):
+
             @param_table({})
             def test_empty():
                 pass
@@ -300,10 +333,13 @@ class TestErrorCases:
         """Test that missing parameter raises KeyError."""
 
         with pytest.raises(KeyError, match="missing required parameter"):
-            @param_table({
-                "complete": {"x": 1, "y": 2},  # Has both x and y
-                "incomplete": {"x": 1},  # Missing 'y' which is now "owned"
-            })
+
+            @param_table(
+                {
+                    "complete": {"x": 1, "y": 2},  # Has both x and y
+                    "incomplete": {"x": 1},  # Missing 'y' which is now "owned"
+                }
+            )
             def test_missing(x: int, y: int):
                 pass
 
@@ -311,10 +347,13 @@ class TestErrorCases:
         """Test that error message is helpful."""
 
         with pytest.raises(KeyError, match="Missing: y") as exc_info:
-            @param_table({
-                "complete": {"x": 1, "y": 2},  # Has both x and y
-                "incomplete": {"x": 1},  # Missing 'y' which is now "owned"
-            })
+
+            @param_table(
+                {
+                    "complete": {"x": 1, "y": 2},  # Has both x and y
+                    "incomplete": {"x": 1},  # Missing 'y' which is now "owned"
+                }
+            )
             def test_missing_msg(x: int, y: int):
                 pass
 
@@ -345,10 +384,12 @@ class TestEdgeCases:
     def test_params_without_type_hints(self):
         """Test parameters without type hints."""
 
-        @param_table({
-            "case1": {"a": 1, "b": "x"},
-            "case2": {"a": [1, 2], "b": {"key": "val"}},
-        })
+        @param_table(
+            {
+                "case1": {"a": 1, "b": "x"},
+                "case2": {"a": [1, 2], "b": {"key": "val"}},
+            }
+        )
         def test_no_hints(a, b):
             pass
 
@@ -365,22 +406,31 @@ class TestEdgeCases:
         """Test that providing params not in function signature raises ValueError."""
 
         with pytest.raises(ValueError, match="provided parameter.*not in function signature"):
-            @param_table({
-                "case1": {"x": 1, "z": 999},  # z is not in function signature
-            })
+
+            @param_table(
+                {
+                    "case1": {"x": 1, "z": 999},  # z is not in function signature
+                }
+            )
             def test_extra(x: int, y: int):
                 pass
 
     def test_function_with_problematic_type_hints(self):
         """Test handling of functions where get_type_hints fails."""
+
         # Create a function with forward references that can't be resolved
         def make_test():
             # Use string annotation that references non-existent type
-            @param_table({
-                "case1": {"x": 1},
-            })
-            def test_bad_hints(x: "NonExistentType"):  # noqa: F821
+            @param_table(
+                {
+                    "case1": {"x": 1},
+                }
+            )
+            def test_bad_hints(
+                x: "NonExistentType",  # noqa: F821  # pyright: ignore[reportUndefinedVariable]
+            ):
                 pass
+
             return test_bad_hints
 
         # This should not raise an error, just skip type checking
@@ -391,7 +441,6 @@ class TestEdgeCases:
         """Test that functions without source info still work."""
         # Lambdas don't have source lines, testing the except branch
         # We can't use lambda directly with decorator, but we can test with exec
-        import types
 
         # Create a function dynamically
         code = compile("def test_func(x: int): pass", "<string>", "exec")
@@ -408,20 +457,24 @@ class TestEdgeCases:
 class TestActualExecution:
     """Tests that actually run and verify behavior."""
 
-    @param_table({
-        "empty": {"text": "", "expected": ""},
-        "single": {"text": "a", "expected": "a"},
-        "multiple": {"text": "abc", "expected": "cba"},
-    })
+    @param_table(
+        {
+            "empty": {"text": "", "expected": ""},
+            "single": {"text": "a", "expected": "a"},
+            "multiple": {"text": "abc", "expected": "cba"},
+        }
+    )
     def test_string_reverse(self, text: str, expected: str):
         """Test actual string reversal."""
         assert text[::-1] == expected
 
-    @param_table({
-        "positive": {"x": 5, "y": 3, "expected": 8},
-        "negative": {"x": -2, "y": -3, "expected": -5},
-        "mixed": {"x": 10, "y": -4, "expected": 6},
-    })
+    @param_table(
+        {
+            "positive": {"x": 5, "y": 3, "expected": 8},
+            "negative": {"x": -2, "y": -3, "expected": -5},
+            "mixed": {"x": 10, "y": -4, "expected": 6},
+        }
+    )
     def test_addition(self, x: int, y: int, expected: int):
         """Test actual addition."""
         assert x + y == expected
@@ -436,7 +489,3 @@ class TestActualExecution:
     def test_with_defaults_execution(self, value: int, multiplier: int, expected: int):
         """Test execution with defaults."""
         assert value * multiplier == expected
-
-
-# Import Any for type hints
-from typing import Any
